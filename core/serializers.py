@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from core.models import Movie, Session, SessionSeat, Ticket
 
+
 User = get_user_model()
 
 
