@@ -48,7 +48,8 @@ curl http://localhost:8000/api/movies/
 - Redoc: `/api/redoc/`
 
 ## Frontend básico
-Frontend servido pelo próprio backend. Acesse a raiz do domínio e o app abre automaticamente.
+Frontend servido pelo próprio backend. Acesse:
+`https://desafiobackend2026-production.up.railway.app`
 Se quiser testar localmente, ainda pode abrir `frontend/index.html`.
 
 ## Testes rápidos (frontend)
