@@ -7,17 +7,35 @@
     <link rel="stylesheet" href="/frontend/styles.css" />
   </head>
   <body>
-    <div class="hero">
-      <div class="hero-content">
-        <p class="eyebrow">Cinepolis Natal</p>
-        <h1>Ingressos, sessões e assentos em um clique</h1>
-        <p class="sub">Frontend básico para testar a API pública.</p>
+    <div class="marquee">
+      <div class="marquee-track">
+        <span>• CINÉPOLIS NATAL • SALA PRINCIPAL • SESSÕES AO VIVO •</span>
+        <span>• CINÉPOLIS NATAL • SALA PRINCIPAL • SESSÕES AO VIVO •</span>
       </div>
     </div>
 
+    <header class="hero">
+      <div class="hero-content">
+        <p class="label">Cinema local</p>
+        <h1>Uma experiência de bilheteria com clima de cinema real</h1>
+        <p class="sub">Frontend básico para testar a API pública com uma estética inspirada em salas clássicas.</p>
+        <div class="hero-actions">
+          <button class="pill">Front end</button>
+          <button class="pill ghost">API ao vivo</button>
+        </div>
+      </div>
+      <div class="screen">
+        <div class="screen-glow"></div>
+        <div class="screen-title">Em cartaz agora</div>
+      </div>
+    </header>
+
     <main class="shell">
-      <section class="card">
-        <h2>Configuração</h2>
+      <section class="ticket">
+        <div class="ticket-header">
+          <h2>Configuração</h2>
+          <span class="stamp">Acesso</span>
+        </div>
         <div class="grid">
           <label>
             Base URL
@@ -34,8 +52,11 @@
         </div>
       </section>
 
-      <section class="card">
-        <h2>Cadastro</h2>
+      <section class="ticket">
+        <div class="ticket-header">
+          <h2>Cadastro</h2>
+          <span class="stamp">Novo usuário</span>
+        </div>
         <div class="grid">
           <label>Email <input id="regEmail" type="email" placeholder="user@email.com" /></label>
           <label>Usuário <input id="regUsername" type="text" placeholder="usuario" /></label>
@@ -47,8 +68,11 @@
         <pre id="registerOut" class="output"></pre>
       </section>
 
-      <section class="card">
-        <h2>Login</h2>
+      <section class="ticket">
+        <div class="ticket-header">
+          <h2>Login</h2>
+          <span class="stamp">Sessão ativa</span>
+        </div>
         <div class="grid">
           <label>Usuário <input id="loginUsername" type="text" placeholder="usuario" /></label>
           <label>Senha <input id="loginPassword" type="password" placeholder="senha123" /></label>
@@ -59,16 +83,22 @@
         <pre id="loginOut" class="output"></pre>
       </section>
 
-      <section class="card">
-        <h2>Filmes</h2>
+      <section class="ticket">
+        <div class="ticket-header">
+          <h2>Filmes em cartaz</h2>
+          <span class="stamp">Catálogo</span>
+        </div>
         <div class="actions">
           <button id="loadMovies">Carregar filmes</button>
         </div>
         <div id="movies" class="list"></div>
       </section>
 
-      <section class="card">
-        <h2>Sessões</h2>
+      <section class="ticket">
+        <div class="ticket-header">
+          <h2>Sessões</h2>
+          <span class="stamp">Programação</span>
+        </div>
         <div class="grid">
           <label>Movie ID <input id="movieId" type="number" placeholder="ID do filme" /></label>
           <div class="actions">
@@ -78,19 +108,30 @@
         <div id="sessions" class="list"></div>
       </section>
 
-      <section class="card">
-        <h2>Mapa de assentos</h2>
+      <section class="ticket wide">
+        <div class="ticket-header">
+          <h2>Mapa de assentos</h2>
+          <span class="stamp">Sala</span>
+        </div>
         <div class="grid">
           <label>Session ID <input id="sessionId" type="number" placeholder="ID da sessão" /></label>
           <div class="actions">
             <button id="loadSeats">Carregar assentos</button>
           </div>
         </div>
+        <div class="legend">
+          <span class="dot available"></span> Disponível
+          <span class="dot reserved"></span> Reservado
+          <span class="dot purchased"></span> Comprado
+        </div>
         <div id="seats" class="seats"></div>
       </section>
 
-      <section class="card">
-        <h2>Reserva e Checkout</h2>
+      <section class="ticket">
+        <div class="ticket-header">
+          <h2>Reserva e Checkout</h2>
+          <span class="stamp">Ticket</span>
+        </div>
         <div class="grid">
           <label>Session ID <input id="actionSessionId" type="number" placeholder="ID da sessão" /></label>
           <label>Seat ID <input id="actionSeatId" type="number" placeholder="ID do assento" /></label>
@@ -102,8 +143,11 @@
         <pre id="actionOut" class="output"></pre>
       </section>
 
-      <section class="card">
-        <h2>Meus ingressos</h2>
+      <section class="ticket">
+        <div class="ticket-header">
+          <h2>Meus ingressos</h2>
+          <span class="stamp">Histórico</span>
+        </div>
         <div class="actions">
           <button id="loadTickets">Carregar ingressos</button>
         </div>
