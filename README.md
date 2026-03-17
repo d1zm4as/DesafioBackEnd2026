@@ -50,6 +50,31 @@ curl http://localhost:8000/api/movies/
 ## Frontend básico
 Arquivos em `frontend/`. Abra `frontend/index.html` no navegador e informe a Base URL se necessário.
 
+## Testes rápidos (frontend)
+1. Abra `frontend/index.html`
+2. Use Base URL: `https://desafiobackend2026-production.up.railway.app`
+3. Fluxo sugerido:
+   - Cadastro
+   - Login (pegar token)
+   - Carregar filmes
+   - Carregar sessões
+   - Carregar assentos
+   - Reservar / Checkout
+   - Meus ingressos
+
+## Testes rápidos (curl)
+```bash
+# cadastro
+curl -X POST https://desafiobackend2026-production.up.railway.app/api/auth/register/ \\
+  -H "Content-Type: application/json" \\
+  -d '{"email":"teste@exemplo.com","username":"user1","password":"senha123"}'
+
+# login (JWT)
+curl -X POST https://desafiobackend2026-production.up.railway.app/api/auth/token/ \\
+  -H "Content-Type: application/json" \\
+  -d '{"username":"user1","password":"senha123"}'
+```
+
 ## Base URL (produção)
 `https://desafiobackend2026-production.up.railway.app`
 
