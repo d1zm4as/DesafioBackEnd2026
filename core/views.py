@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponse
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import generics, permissions, status
@@ -151,10 +151,31 @@ class MyTicketsView(generics.ListAPIView):
 
 
 def frontend_index(request):
-    file_path = settings.BASE_DIR / 'frontend' / 'index.html'
-    if not file_path.exists():
-        raise Http404('Frontend not found.')
-    return FileResponse(open(file_path, 'rb'), content_type='text/html')
+    base_dir = settings.BASE_DIR / 'frontend'
+    index_path = base_dir / 'index.html'
+    css_path = base_dir / 'styles.css'
+    js_path = base_dir / 'app.js'
+
+    if not index_path.exists():
+        return HttpResponse(
+            '<h1>Frontend indisponível</h1><p>Abra /api/docs/ para testar a API.</p>',
+            content_type='text/html',
+        )
+
+    html = index_path.read_text(encoding='utf-8')
+    if css_path.exists():
+        css = css_path.read_text(encoding='utf-8')
+        html = html.replace(
+            '<link rel="stylesheet" href="/frontend/styles.css" />',
+            f'<style>{css}</style>',
+        )
+    if js_path.exists():
+        js = js_path.read_text(encoding='utf-8')
+        html = html.replace(
+            '<script src="/frontend/app.js"></script>',
+            f'<script>{js}</script>',
+        )
+    return HttpResponse(html, content_type='text/html')
 
 
 def frontend_asset(request, filename: str):
