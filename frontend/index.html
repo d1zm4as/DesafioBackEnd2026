@@ -3,157 +3,189 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cinepolis Natal - Frontend Básico</title>
+    <title>Cinepolis Natal - Cinema Desk</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/frontend/styles.css" />
   </head>
   <body>
-    <div class="marquee">
-      <div class="marquee-track">
-        <span>• CINÉPOLIS NATAL • SALA PRINCIPAL • SESSÕES AO VIVO •</span>
-        <span>• CINÉPOLIS NATAL • SALA PRINCIPAL • SESSÕES AO VIVO •</span>
-      </div>
-    </div>
-
-    <header class="hero">
-      <div class="hero-content">
-        <p class="label">Cinema local</p>
-        <h1>Uma experiência de bilheteria com clima de cinema real</h1>
-        <p class="sub">Frontend básico para testar a API pública com uma estética inspirada em salas clássicas.</p>
-        <div class="hero-actions">
-          <button class="pill">Front end</button>
-          <button class="pill ghost">API ao vivo</button>
+    <div class="grain"></div>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">CN</span>
+        <div>
+          <p class="brand-label">Cinepolis Natal</p>
+          <h1>Cinema Desk</h1>
         </div>
       </div>
-      <div class="screen">
-        <div class="screen-glow"></div>
-        <div class="screen-title">Em cartaz agora</div>
+      <div class="status" id="statusBar">
+        <span class="status-dot"></span>
+        <span id="statusText">Pronto para conectar</span>
       </div>
     </header>
 
-    <main class="shell">
-      <section class="ticket">
-        <div class="ticket-header">
-          <h2>Configuração</h2>
-          <span class="stamp">Acesso</span>
+    <main class="layout">
+      <section class="panel hero">
+        <div>
+          <p class="eyebrow">Operacao</p>
+          <h2>Gerencie a bilheteria como um operador real</h2>
+          <p class="sub">
+            Interface mais clara para testar a API, com fluxo guiado: escolher filme, abrir sessao,
+            selecionar assentos e finalizar checkout.
+          </p>
+          <div class="hero-actions">
+            <button id="testApi" class="btn">Testar conexao</button>
+            <button id="resetUi" class="btn ghost">Limpar estado</button>
+          </div>
         </div>
-        <div class="grid">
-          <label>
-            Base URL
-            <input id="baseUrl" type="text" value="https://desafiobackend2026-production.up.railway.app" />
-          </label>
-          <label>
-            JWT (access)
-            <input id="jwtToken" type="text" placeholder="Cole aqui o token" />
-          </label>
-          <div class="actions">
-            <button id="saveConfig">Salvar</button>
-            <button id="clearConfig" class="ghost">Limpar</button>
+        <div class="poster">
+          <div class="poster-screen">
+            <p>Em cartaz hoje</p>
+            <strong id="posterTitle">Selecione um filme</strong>
+          </div>
+          <div class="poster-strip"></div>
+        </div>
+      </section>
+
+      <section class="panel config">
+        <div class="panel-header">
+          <h3>Configuracao</h3>
+          <span class="tag">API</span>
+        </div>
+        <div class="field">
+          <label for="baseUrl">Base URL</label>
+          <input id="baseUrl" type="text" value="" />
+        </div>
+        <div class="field">
+          <label for="jwtToken">JWT (access)</label>
+          <input id="jwtToken" type="text" placeholder="Cole o token aqui" />
+        </div>
+        <div class="inline-actions">
+          <button id="saveConfig" class="btn">Salvar</button>
+          <button id="clearConfig" class="btn ghost">Limpar</button>
+        </div>
+        <p class="hint" id="tokenHint">Nao autenticado</p>
+      </section>
+
+      <section class="panel auth">
+        <div class="panel-header">
+          <h3>Acesso</h3>
+          <span class="tag">Conta</span>
+        </div>
+        <div class="grid-2">
+          <div>
+            <h4>Cadastro</h4>
+            <div class="field">
+              <label for="regEmail">Email</label>
+              <input id="regEmail" type="email" placeholder="user@email.com" />
+            </div>
+            <div class="field">
+              <label for="regUsername">Usuario</label>
+              <input id="regUsername" type="text" placeholder="usuario" />
+            </div>
+            <div class="field">
+              <label for="regPassword">Senha</label>
+              <input id="regPassword" type="password" placeholder="senha123" />
+            </div>
+            <button id="registerBtn" class="btn">Cadastrar</button>
+          </div>
+          <div>
+            <h4>Login</h4>
+            <div class="field">
+              <label for="loginUsername">Usuario</label>
+              <input id="loginUsername" type="text" placeholder="usuario" />
+            </div>
+            <div class="field">
+              <label for="loginPassword">Senha</label>
+              <input id="loginPassword" type="password" placeholder="senha123" />
+            </div>
+            <button id="loginBtn" class="btn accent">Entrar</button>
           </div>
         </div>
       </section>
 
-      <section class="ticket">
-        <div class="ticket-header">
-          <h2>Cadastro</h2>
-          <span class="stamp">Novo usuário</span>
+      <section class="panel movies">
+        <div class="panel-header">
+          <h3>Filmes em cartaz</h3>
+          <span class="tag">Catalogo</span>
         </div>
-        <div class="grid">
-          <label>Email <input id="regEmail" type="email" placeholder="user@email.com" /></label>
-          <label>Usuário <input id="regUsername" type="text" placeholder="usuario" /></label>
-          <label>Senha <input id="regPassword" type="password" placeholder="senha123" /></label>
-          <div class="actions">
-            <button id="registerBtn">Cadastrar</button>
+        <button id="loadMovies" class="btn">Carregar filmes</button>
+        <div id="movies" class="card-list"></div>
+      </section>
+
+      <section class="panel sessions">
+        <div class="panel-header">
+          <h3>Sessoes</h3>
+          <span class="tag">Programacao</span>
+        </div>
+        <div class="inline-actions">
+          <button id="loadSessions" class="btn">Carregar sessoes</button>
+          <button id="refreshSeats" class="btn ghost">Atualizar assentos</button>
+        </div>
+        <p class="hint" id="sessionHint">Nenhum filme selecionado.</p>
+        <div id="sessions" class="card-list"></div>
+      </section>
+
+      <section class="panel seats span-2">
+        <div class="panel-header">
+          <h3>Mapa de assentos</h3>
+          <span class="tag">Sala</span>
+        </div>
+        <div class="seat-summary">
+          <div>
+            <p>Sessao selecionada</p>
+            <strong id="selectedSession">-</strong>
           </div>
-        </div>
-        <pre id="registerOut" class="output"></pre>
-      </section>
-
-      <section class="ticket">
-        <div class="ticket-header">
-          <h2>Login</h2>
-          <span class="stamp">Sessão ativa</span>
-        </div>
-        <div class="grid">
-          <label>Usuário <input id="loginUsername" type="text" placeholder="usuario" /></label>
-          <label>Senha <input id="loginPassword" type="password" placeholder="senha123" /></label>
-          <div class="actions">
-            <button id="loginBtn">Entrar</button>
+          <div>
+            <p>Assento selecionado</p>
+            <strong id="selectedSeat">-</strong>
           </div>
-        </div>
-        <pre id="loginOut" class="output"></pre>
-      </section>
-
-      <section class="ticket">
-        <div class="ticket-header">
-          <h2>Filmes em cartaz</h2>
-          <span class="stamp">Catálogo</span>
-        </div>
-        <div class="actions">
-          <button id="loadMovies">Carregar filmes</button>
-        </div>
-        <div id="movies" class="list"></div>
-      </section>
-
-      <section class="ticket">
-        <div class="ticket-header">
-          <h2>Sessões</h2>
-          <span class="stamp">Programação</span>
-        </div>
-        <div class="grid">
-          <label>Movie ID <input id="movieId" type="number" placeholder="ID do filme" /></label>
-          <div class="actions">
-            <button id="loadSessions">Carregar sessões</button>
-          </div>
-        </div>
-        <div id="sessions" class="list"></div>
-      </section>
-
-      <section class="ticket wide">
-        <div class="ticket-header">
-          <h2>Mapa de assentos</h2>
-          <span class="stamp">Sala</span>
-        </div>
-        <div class="grid">
-          <label>Session ID <input id="sessionId" type="number" placeholder="ID da sessão" /></label>
-          <div class="actions">
-            <button id="loadSeats">Carregar assentos</button>
+          <div class="inline-actions">
+            <button id="reserveBtn" class="btn">Reservar</button>
+            <button id="checkoutBtn" class="btn accent">Checkout</button>
           </div>
         </div>
         <div class="legend">
-          <span class="dot available"></span> Disponível
-          <span class="dot reserved"></span> Reservado
-          <span class="dot purchased"></span> Comprado
+          <span class="seat-dot available"></span> Disponivel
+          <span class="seat-dot reserved"></span> Reservado
+          <span class="seat-dot purchased"></span> Comprado
+          <span class="seat-dot selected"></span> Selecionado
         </div>
-        <div id="seats" class="seats"></div>
+        <div id="seats" class="seats-grid"></div>
       </section>
 
-      <section class="ticket">
-        <div class="ticket-header">
-          <h2>Reserva e Checkout</h2>
-          <span class="stamp">Ticket</span>
+      <section class="panel tickets">
+        <div class="panel-header">
+          <h3>Meus ingressos</h3>
+          <span class="tag">Historico</span>
         </div>
-        <div class="grid">
-          <label>Session ID <input id="actionSessionId" type="number" placeholder="ID da sessão" /></label>
-          <label>Seat ID <input id="actionSeatId" type="number" placeholder="ID do assento" /></label>
-          <div class="actions">
-            <button id="reserveBtn">Reservar</button>
-            <button id="checkoutBtn" class="accent">Checkout</button>
-          </div>
+        <div class="inline-actions">
+          <select id="ticketFilter" class="select">
+            <option value="all">Todos</option>
+            <option value="upcoming">Proximos</option>
+            <option value="past">Passados</option>
+          </select>
+          <button id="loadTickets" class="btn">Carregar ingressos</button>
         </div>
-        <pre id="actionOut" class="output"></pre>
+        <div id="tickets" class="card-list"></div>
       </section>
 
-      <section class="ticket">
-        <div class="ticket-header">
-          <h2>Meus ingressos</h2>
-          <span class="stamp">Histórico</span>
+      <section class="panel log">
+        <div class="panel-header">
+          <h3>Resposta da API</h3>
+          <span class="tag">Debug</span>
         </div>
-        <div class="actions">
-          <button id="loadTickets">Carregar ingressos</button>
-        </div>
-        <div id="tickets" class="list"></div>
+        <pre id="apiLog" class="log-output">Nenhuma chamada realizada.</pre>
       </section>
     </main>
+
+    <footer class="footer">
+      <p>Frontend leve para testes. Use o Swagger em /api/docs/ para explorar tudo.</p>
+    </footer>
 
     <script src="/frontend/app.js"></script>
   </body>
