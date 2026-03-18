@@ -27,6 +27,8 @@ const state = {
   seats: [],
 };
 
+const sessionStatusCache = new Map();
+
 const normalizeBaseUrl = (value) => value.replace(/\/+$/, '');
 
 const setStatus = (message, type = 'info') => {
@@ -89,6 +91,75 @@ const formatDate = (value) => {
   return parsed.toLocaleString('pt-BR');
 };
 
+const formatDayLabel = (value) => {
+  if (!value) return '-';
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(parsed);
+  target.setHours(0, 0, 0, 0);
+  const diffDays = Math.round((target - today) / 86400000);
+  const shortDate = target.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+  });
+  if (diffDays === 0) return `Hoje, ${shortDate}`;
+  if (diffDays === 1) return `Amanhã, ${shortDate}`;
+  return parsed.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'short',
+  });
+};
+
+const getSessionStatus = (seats, session) => {
+  const total = session.total_rows * session.seats_per_row;
+  const available = seats.filter((seat) => seat.status === 'available').length;
+  const ratio = total ? available / total : 0;
+  let label = 'Disponivel';
+  let tone = 'ok';
+  if (available === 0) {
+    label = 'Lotado';
+    tone = 'full';
+  } else if (ratio <= 0.2) {
+    label = 'Poucas vagas';
+    tone = 'warn';
+  }
+  return { label, tone, available, total };
+};
+
+const hydrateSessionStatus = async (session, statusEl, countEl) => {
+  if (sessionStatusCache.has(session.id)) {
+    const cached = sessionStatusCache.get(session.id);
+    statusEl.textContent = cached.label;
+    statusEl.className = `session-status ${cached.tone}`;
+    countEl.textContent = `${cached.available}/${cached.total} disponiveis`;
+    return;
+  }
+  statusEl.textContent = 'Carregando...';
+  const result = await api(`/api/sessions/${session.id}/seats/`, { auth: false });
+  if (!result.ok) {
+    statusEl.textContent = 'Indisponivel';
+    statusEl.className = 'session-status neutral';
+    countEl.textContent = '-';
+    return;
+  }
+  const status = getSessionStatus(result.data || [], session);
+  sessionStatusCache.set(session.id, status);
+  statusEl.textContent = status.label;
+  statusEl.className = `session-status ${status.tone}`;
+  countEl.textContent = `${status.available}/${status.total} disponiveis`;
+};
+
+const renderStars = (value) => {
+  const numeric = Number(value);
+  const count = Number.isFinite(numeric) ? Math.min(5, Math.max(1, Math.round(numeric))) : 0;
+  const filled = '&#9733;'.repeat(count);
+  const empty = '&#9734;'.repeat(5 - count);
+  return `<span class="stars" aria-label="rating ${count}/5">${filled}${empty}</span>`;
+};
+
 const resetUi = () => {
   state.selectedMovie = null;
   state.selectedSession = null;
@@ -119,6 +190,7 @@ const renderMovies = (movies) => {
       <strong>${movie.title}</strong>
       <p>${movie.description || 'Sem descricao.'}</p>
       <p>Duraçao: ${movie.duration_minutes} min</p>
+      <div class="rating">Avaliacao: ${renderStars(movie.rating)}</div>
       <div class="card-actions">
         <button class="btn" data-movie-id="${movie.id}">Ver sessoes</button>
       </div>
@@ -139,25 +211,55 @@ const renderSessions = (sessions) => {
     dom.sessions.innerHTML = '<p class="hint">Nenhuma sessao encontrada.</p>';
     return;
   }
-  sessions.forEach((session) => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <strong>Sessao ${session.id}</strong>
-      <p>${formatDate(session.starts_at)}</p>
-      <p>Sala: ${session.auditorium}</p>
-      <div class="card-actions">
-        <button class="btn" data-session-id="${session.id}">Abrir assentos</button>
-      </div>
-    `;
-    card.querySelector('button').addEventListener('click', () => {
-      state.selectedSession = session;
-      dom.selectedSession.textContent = `#${session.id} - ${formatDate(session.starts_at)}`;
-      state.selectedSeat = null;
-      dom.selectedSeat.textContent = '-';
-      loadSeats();
+  const sorted = [...sessions].sort(
+    (a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime()
+  );
+  const groups = new Map();
+  sorted.forEach((session) => {
+    const key = new Date(session.starts_at).toDateString();
+    if (!groups.has(key)) {
+      groups.set(key, { label: formatDayLabel(session.starts_at), items: [] });
+    }
+    groups.get(key).items.push(session);
+  });
+
+  groups.forEach((group) => {
+    const block = document.createElement('div');
+    block.className = 'session-group';
+    block.innerHTML = `<div class="session-group-header">${group.label}</div>`;
+    const list = document.createElement('div');
+    list.className = 'card-list';
+
+    group.items.forEach((session) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="session-head">
+          <strong>Sessao ${session.id}</strong>
+          <span class="session-status neutral">Status</span>
+        </div>
+        <p>${formatDate(session.starts_at)}</p>
+        <p>Sala: ${session.auditorium}</p>
+        <p class="session-count">-</p>
+        <div class="card-actions">
+          <button class="btn" data-session-id="${session.id}">Abrir assentos</button>
+        </div>
+      `;
+      card.querySelector('button').addEventListener('click', () => {
+        state.selectedSession = session;
+        dom.selectedSession.textContent = `#${session.id} - ${formatDate(session.starts_at)}`;
+        state.selectedSeat = null;
+        dom.selectedSeat.textContent = '-';
+        loadSeats();
+      });
+      list.appendChild(card);
+      const statusEl = card.querySelector('.session-status');
+      const countEl = card.querySelector('.session-count');
+      hydrateSessionStatus(session, statusEl, countEl);
     });
-    dom.sessions.appendChild(card);
+
+    block.appendChild(list);
+    dom.sessions.appendChild(block);
   });
 };
 
