@@ -3,7 +3,8 @@
 API de ingressos para o cinema Cinépolis Natal.
 
 ## Requisitos
-- Docker e Docker Compose
+- Docker e Docker Compose (recomendado)
+- Python 3.12 + Poetry (para execução local)
 
 ## Subir o projeto
 ```bash
@@ -15,6 +16,50 @@ docker compose up --build
 poetry install --no-root
 poetry run python manage.py migrate --noinput
 poetry run gunicorn config.wsgi:application --bind 0.0.0.0:8000
+```
+
+## Variáveis de ambiente
+Use `.env.example` como base.
+
+Principais:
+- `DJANGO_SECRET_KEY`
+- `DJANGO_DEBUG`
+- `DJANGO_ALLOWED_HOSTS`
+- `POSTGRES_*`
+- `REDIS_URL`
+- `CELERY_BROKER_URL`
+- `CELERY_RESULT_BACKEND`
+- `CORS_ALLOW_ALL_ORIGINS`
+- `CORS_ALLOWED_ORIGINS`
+
+## Recursos implementados
+- Autenticação JWT (SimpleJWT)
+- PostgreSQL
+- Redis para cache e locks de assentos
+- Celery (worker + beat) para tarefas assíncronas
+- Paginação obrigatória em listagens
+- Rate limiting (DRF throttling)
+- Documentação Swagger/Redoc
+
+### Cache
+- `GET /api/movies/` e `GET /api/movies/{id}/sessions/` usam cache Redis (TTL 300s).
+
+### Locks de assentos
+- Reserva com lock temporário (TTL 10 minutos).
+- Celery Beat limpa locks expirados a cada 60s.
+
+## Testes
+```bash
+poetry run python manage.py test
+```
+
+Observações:
+- Alguns testes dependem do Redis e são ignorados se o Redis não estiver disponível.
+- Para rodar tudo localmente, use `docker compose up` e execute os testes no container `web`.
+
+Exemplo usando Docker:
+```bash
+docker compose exec web poetry run python manage.py test
 ```
 
 ## Checklist rápido (smoke test)
